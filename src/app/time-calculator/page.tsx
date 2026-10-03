@@ -18,6 +18,7 @@ const RELATED = [
   { slug: "work-hours-calculator", title: "Work Hours Calculator", description: "Calculate hours worked with breaks" },
   { slug: "decimal-hours-calculator", title: "Decimal Hours Calculator", description: "Convert hours and minutes to decimal" },
   { slug: "time-card-calculator", title: "Time Card Calculator", description: "Track a full work week" },
+  { slug: "military-time-converter", title: "Military Time Converter", description: "Convert between military, 24-hour, and 12-hour time" },
 ];
 
 export default function TimeCalculatorPage() {
@@ -83,6 +84,44 @@ export default function TimeCalculatorPage() {
               <li>Multiply a shift duration by the number of days</li>
               <li>Convert total time to decimal hours for billing</li>
             </ul>
+          </div>
+
+          <div>
+            <h2 className="mb-2 text-lg font-semibold text-zinc-900">
+              Frequently asked questions
+            </h2>
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-medium text-zinc-800">
+                  Can this calculator work with seconds?
+                </h3>
+                <p className="mt-1">
+                  Yes. Enter seconds in either duration. Results include
+                  seconds when they are non-zero (for example, 14m 30s) and
+                  stay in whole minutes when seconds are zero.
+                </p>
+              </div>
+              <div>
+                <h3 className="font-medium text-zinc-800">
+                  What happens if I subtract more time than I have?
+                </h3>
+                <p className="mt-1">
+                  The result is shown as a negative duration (for example,
+                  &minus;1 hours) instead of an error, so you can see exactly
+                  how much time is missing.
+                </p>
+              </div>
+              <div>
+                <h3 className="font-medium text-zinc-800">
+                  Can I multiply a duration?
+                </h3>
+                <p className="mt-1">
+                  Yes. Choose Multiply and enter a multiplier such as 2 to
+                  double a shift, or 5 to total a daily duration across a work
+                  week.
+                </p>
+              </div>
+            </div>
           </div>
         </section>
 

@@ -8,6 +8,12 @@ const CALCULATOR_SLUGS = [
   "hours-calculator",
   "time-calculator",
   "decimal-hours-calculator",
+  "hours-to-minutes",
+  "minutes-to-hours",
+  "timesheet-calculator",
+  "work-hours-in-a-year-calculator",
+  "military-time-converter",
+  "overtime-calculator",
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {

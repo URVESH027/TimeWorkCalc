@@ -4,4 +4,3 @@ export { NumberInput } from "./inputs/NumberInput";
 export { ResultCard } from "./results/ResultCard";
 export { CopyButton } from "./actions/CopyButton";
 export { ResetButton } from "./actions/ResetButton";
-export { Section } from "./Section";

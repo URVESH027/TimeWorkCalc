@@ -115,6 +115,65 @@ describe("Calculator workflows", () => {
     });
   });
 
+  describe("Workflow G: Natural hour-only input", () => {
+    it("10 am → 6 pm = 8 hours", () => {
+      const start = parseClockTime("10 am");
+      const end = parseClockTime("6 pm");
+      expect(start.ok).toBe(true);
+      expect(end.ok).toBe(true);
+      if (start.ok && end.ok) {
+        const result = timeDifference(start.value, end.value);
+        expect(result.ok).toBe(true);
+        if (result.ok) {
+          expect(result.value.duration).toEqual({ hours: 8, minutes: 0, seconds: 0 });
+          expect(result.value.decimalHours).toBe(8);
+        }
+      }
+    });
+
+    it("10 pm → 6 am = 8 hours overnight", () => {
+      const start = parseClockTime("10 pm");
+      const end = parseClockTime("6 am");
+      expect(start.ok).toBe(true);
+      expect(end.ok).toBe(true);
+      if (start.ok && end.ok) {
+        const result = timeDifference(start.value, end.value, true);
+        expect(result.ok).toBe(true);
+        if (result.ok) {
+          expect(result.value.duration).toEqual({ hours: 8, minutes: 0, seconds: 0 });
+        }
+      }
+    });
+
+    it("12 am → 12 pm = 12 hours", () => {
+      const start = parseClockTime("12 am");
+      const end = parseClockTime("12 pm");
+      expect(start.ok).toBe(true);
+      expect(end.ok).toBe(true);
+      if (start.ok && end.ok) {
+        const result = timeDifference(start.value, end.value);
+        expect(result.ok).toBe(true);
+        if (result.ok) {
+          expect(result.value.duration).toEqual({ hours: 12, minutes: 0, seconds: 0 });
+        }
+      }
+    });
+
+    it("12 pm → 12 am = 12 hours overnight", () => {
+      const start = parseClockTime("12 pm");
+      const end = parseClockTime("12 am");
+      expect(start.ok).toBe(true);
+      expect(end.ok).toBe(true);
+      if (start.ok && end.ok) {
+        const result = timeDifference(start.value, end.value, true);
+        expect(result.ok).toBe(true);
+        if (result.ok) {
+          expect(result.value.duration).toEqual({ hours: 12, minutes: 0, seconds: 0 });
+        }
+      }
+    });
+  });
+
   describe("Workflow F: Decimal hour conversion", () => {
     it("converts 7h 30m to 7.5", () => {
       const d = { hours: 7, minutes: 30, seconds: 0 };

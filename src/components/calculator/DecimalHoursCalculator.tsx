@@ -60,7 +60,7 @@ export function DecimalHoursCalculator() {
     : "";
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex gap-2" role="group" aria-label="Conversion direction">
         {([
           { key: "toDecimal", label: "HH:MM → Decimal" },
@@ -82,45 +82,51 @@ export function DecimalHoursCalculator() {
         ))}
       </div>
 
-      {direction === "toDecimal" ? (
-        <div className="grid grid-cols-2 gap-3">
-          <NumberInput label="Hours" value={hours} onChange={setHours} placeholder="7" min={0} />
-          <NumberInput label="Minutes" value={minutes} onChange={setMinutes} placeholder="30" min={0} max={59} />
+      <div className="grid items-start gap-4 md:grid-cols-2">
+        <div className="max-w-md">
+          {direction === "toDecimal" ? (
+            <div className="grid grid-cols-2 gap-3">
+              <NumberInput label="Hours" value={hours} onChange={setHours} placeholder="7" min={0} />
+              <NumberInput label="Minutes" value={minutes} onChange={setMinutes} placeholder="30" min={0} max={59} />
+            </div>
+          ) : (
+            <NumberInput
+              label="Decimal hours"
+              value={decimalValue}
+              onChange={setDecimalValue}
+              placeholder="7.5"
+              min={0}
+              step={0.01}
+            />
+          )}
         </div>
-      ) : (
-        <NumberInput
-          label="Decimal hours"
-          value={decimalValue}
-          onChange={setDecimalValue}
-          placeholder="7.5"
-          min={0}
-          step={0.01}
-        />
-      )}
 
-      {result && (
-        <ResultCard
-          primaryLabel="Result"
-          primaryValue={`${result.decimal.toFixed(2)} decimal hours`}
-          secondaryItems={[
-            { label: "Duration", value: result.formattedDuration },
-            { label: "Minutes", value: `${Math.round(durationToTotalMinutes(result.duration))} minutes` },
-          ]}
-        />
-      )}
+        <div className="flex flex-col gap-3">
+          {result && (
+            <ResultCard
+              primaryLabel="Result"
+              primaryValue={`${result.decimal.toFixed(2)} decimal hours`}
+              secondaryItems={[
+                { label: "Duration", value: result.formattedDuration },
+                { label: "Minutes", value: `${Math.round(durationToTotalMinutes(result.duration))} minutes` },
+              ]}
+            />
+          )}
 
-      {result && (
-        <div className="flex gap-2">
-          <CopyButton text={copyText} />
-          <ResetButton onClick={reset} />
+          {result && (
+            <div className="flex gap-2">
+              <CopyButton text={copyText} />
+              <ResetButton onClick={reset} />
+            </div>
+          )}
+
+          {!result && (
+            <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4 text-center text-sm text-zinc-500">
+              Enter a value to convert between hours/minutes and decimal hours.
+            </div>
+          )}
         </div>
-      )}
-
-      {!result && (
-        <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4 text-center text-sm text-zinc-500">
-          Enter a value to convert between hours/minutes and decimal hours.
-        </div>
-      )}
+      </div>
     </div>
   );
 }

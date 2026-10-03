@@ -4,7 +4,11 @@ const SITE_NAME = "TimeWorkCalc";
 
 export default function NotFound() {
   return (
-    <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 focus:outline-none"
+    >
       <div className="mb-6">
         <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">
           Page not found

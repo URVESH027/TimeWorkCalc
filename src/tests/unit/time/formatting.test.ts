@@ -128,3 +128,36 @@ describe("formatClockTime", () => {
     expect(formatClockTime(12, 0, "PM", false)).toBe("12:00 PM");
   });
 });
+
+describe("seconds display rule", () => {
+  it("zero seconds: no unnecessary seconds component (full)", () => {
+    expect(formatDurationFull({ hours: 0, minutes: 14, seconds: 0 })).toBe(
+      "14 minutes",
+    );
+    expect(formatDurationFull({ hours: 2, minutes: 15, seconds: 0 })).toBe(
+      "2 hours 15 minutes",
+    );
+  });
+
+  it("zero seconds: no unnecessary seconds component (short)", () => {
+    expect(formatDurationShort({ hours: 0, minutes: 14, seconds: 0 })).toBe("14m");
+    expect(formatDurationShort({ hours: 2, minutes: 15, seconds: 0 })).toBe(
+      "2h 15m",
+    );
+  });
+
+  it("non-zero seconds are never silently dropped (full)", () => {
+    expect(formatDurationFull({ hours: 0, minutes: 14, seconds: 30 })).toBe(
+      "14 minutes 30 seconds",
+    );
+    expect(formatDurationFull({ hours: 8, minutes: 30, seconds: 30 })).toBe(
+      "8 hours 30 minutes 30 seconds",
+    );
+  });
+
+  it("non-zero seconds are never silently dropped (short)", () => {
+    expect(formatDurationShort({ hours: 0, minutes: 14, seconds: 30 })).toBe(
+      "14m 30s",
+    );
+  });
+});

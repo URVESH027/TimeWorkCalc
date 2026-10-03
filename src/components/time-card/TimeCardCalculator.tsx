@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { Fragment, useState, useCallback, useMemo } from "react";
 import { TimeInput, BreakInput, CopyButton, ResetButton } from "@/components/calculator";
 import {
   parseClockTime,
   calculateWorkHours,
   calculateMultiDayTotals,
-  toMinutesSinceMidnight,
+  toSecondsSinceMidnight,
   durationToTotalMinutes,
   durationToDecimalHours,
   formatDurationFull,
@@ -134,7 +134,7 @@ export function TimeCardCalculator() {
     const multiDayResult = calculateMultiDayTotals(engineEntries);
     if (!multiDayResult.ok) return null;
 
-    const totalMinutes = Math.round(durationToTotalMinutes(multiDayResult.value.totalWorked));
+    const totalMinutes = Math.floor(durationToTotalMinutes(multiDayResult.value.totalWorked));
 
     return {
       worked: multiDayResult.value.totalWorked,
@@ -166,87 +166,147 @@ export function TimeCardCalculator() {
   }, [totals, days, activeDays]);
 
   return (
-    <div className="space-y-6">
-      {activeDays.map((dayIndex) => {
-        const row = days[dayIndex];
-        const dayName = DAY_NAMES[dayIndex];
-        const worked = row.result?.ok ? row.result.value.worked : null;
-        const errorMsg = !row.result?.ok && row.result ? row.result.error.message : null;
-        const isOvernight =
-          row.clockIn.trim() !== "" &&
-          row.clockOut.trim() !== "" &&
-          row.result?.ok &&
-          row.result.value.elapsed.hours > 0 &&
-          parseInput(row.clockIn) &&
-          parseInput(row.clockOut) &&
-          (() => {
-            const ci = parseInput(row.clockIn)!;
-            const co = parseInput(row.clockOut)!;
-            const ciMin = toMinutesSinceMidnight(ci);
-            const coMin = toMinutesSinceMidnight(co);
-            return coMin < ciMin;
-          })();
+    <div className="space-y-4">
+      <div className="min-w-0 max-w-full overflow-x-auto">
+        <table className="w-full min-w-[38rem] border-collapse text-left">
+          <caption className="sr-only">
+            Weekly time card: enter clock-in, clock-out, and break times for
+            each day of the week.
+          </caption>
+          <thead>
+            <tr className="border-b border-zinc-200 bg-zinc-50">
+              <th scope="col" className="px-2 py-2 text-left text-sm font-medium text-zinc-700">
+                Day
+              </th>
+              <th scope="col" className="px-2 py-2 text-left text-sm font-medium text-zinc-700">
+                In
+              </th>
+              <th scope="col" className="px-2 py-2 text-left text-sm font-medium text-zinc-700">
+                Out
+              </th>
+              <th scope="col" className="px-2 py-2 text-left text-sm font-medium text-zinc-700">
+                Break
+              </th>
+              <th scope="col" className="px-2 py-2 text-left text-sm font-medium text-zinc-700">
+                Worked
+              </th>
+              <th scope="col" className="sr-only">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {activeDays.map((dayIndex) => {
+              const row = days[dayIndex];
+              const dayName = DAY_NAMES[dayIndex];
+              const worked = row.result?.ok ? row.result.value.worked : null;
+              const errorMsg = !row.result?.ok && row.result ? row.result.error.message : null;
+              const isOvernight =
+                row.clockIn.trim() !== "" &&
+                row.clockOut.trim() !== "" &&
+                row.result?.ok &&
+                row.result.value.elapsed.hours > 0 &&
+                parseInput(row.clockIn) &&
+                parseInput(row.clockOut) &&
+                (() => {
+                  const ci = parseInput(row.clockIn)!;
+                  const co = parseInput(row.clockOut)!;
+                  const ciSec = toSecondsSinceMidnight(ci);
+                  const coSec = toSecondsSinceMidnight(co);
+                  return coSec < ciSec;
+                })();
 
-        return (
-          <div key={row.id} className="rounded-lg border border-zinc-200 p-4">
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-zinc-900">{dayName}</h2>
-              {activeDays.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() => removeDay(dayIndex)}
-                  className="min-h-[44px] min-w-[44px] rounded p-2 text-sm text-zinc-500 hover:text-red-600"
-                  aria-label={`Remove ${dayName}`}
-                >
-                  Remove
-                </button>
-              )}
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              <TimeInput
-                label="Clock in"
-                value={row.clockIn}
-                onChange={(v) => updateDay(dayIndex, "clockIn", v)}
-                placeholder="9:00 AM"
-              />
-              <TimeInput
-                label="Clock out"
-                value={row.clockOut}
-                onChange={(v) => updateDay(dayIndex, "clockOut", v)}
-                placeholder="5:30 PM"
-              />
-              <BreakInput
-                value={row.breakMin}
-                onChange={(v) => updateDay(dayIndex, "breakMin", v)}
-              />
-              <div className="flex items-end">
-                {worked && (
-                  <div className="w-full rounded-md bg-blue-50 px-3 py-2.5 text-center">
-                    <span className="text-lg font-semibold tabular-nums text-blue-700">
-                      {formatDurationShort(worked)}
-                    </span>
-                    <span className="mt-0.5 block text-xs tabular-nums text-blue-600">
-                      {durationToDecimalHours(worked).toFixed(2)}h
-                    </span>
-                    {isOvernight && (
-                      <span className="mt-0.5 block text-xs text-blue-600">
-                        overnight
-                      </span>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {errorMsg && (
-              <div className="mt-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700" role="alert">
-                {errorMsg}
-              </div>
-            )}
-          </div>
-        );
-      })}
+              return (
+                <Fragment key={row.id}>
+                  <tr className="border-b border-zinc-100 align-middle">
+                    <th
+                      scope="row"
+                      aria-label={dayName}
+                      className="whitespace-nowrap px-2 py-1.5 text-left text-sm font-medium text-zinc-900"
+                    >
+                      <span aria-hidden="true">{dayName.slice(0, 3)}</span>
+                      <span className="sr-only">{dayName}</span>
+                    </th>
+                    <td className="px-2 py-1.5 [&_label]:sr-only">
+                      <TimeInput
+                        label="Clock in"
+                        value={row.clockIn}
+                        onChange={(v) => updateDay(dayIndex, "clockIn", v)}
+                        placeholder="9:00 AM"
+                        defaultPeriod="AM"
+                      />
+                    </td>
+                    <td className="px-2 py-1.5 [&_label]:sr-only">
+                      <TimeInput
+                        label="Clock out"
+                        value={row.clockOut}
+                        onChange={(v) => updateDay(dayIndex, "clockOut", v)}
+                        placeholder="5:30 PM"
+                        defaultPeriod="PM"
+                      />
+                    </td>
+                    <td className="px-2 py-1.5 [&_label]:sr-only [&_input]:w-20">
+                      <BreakInput
+                        value={row.breakMin}
+                        onChange={(v) => updateDay(dayIndex, "breakMin", v)}
+                      />
+                    </td>
+                    <td className="px-2 py-1.5">
+                      {worked ? (
+                        <div className="inline-flex flex-wrap items-baseline gap-x-1.5 rounded-md bg-blue-50 px-2 py-1">
+                          <span className="text-sm font-semibold tabular-nums text-blue-700">
+                            {formatDurationShort(worked)}
+                          </span>
+                          <span aria-hidden="true" className="text-xs text-blue-600">
+                            ·
+                          </span>
+                          <span className="text-xs tabular-nums text-blue-600">
+                            {durationToDecimalHours(worked).toFixed(2)}h
+                          </span>
+                          {isOvernight && (
+                            <span className="rounded bg-blue-100 px-1 text-xs font-medium text-blue-700">
+                              overnight
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <span
+                          aria-hidden="true"
+                          className="block text-center text-sm text-zinc-400"
+                        >
+                          —
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-2 py-1.5 text-right">
+                      {activeDays.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeDay(dayIndex)}
+                          className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded p-2 text-sm text-zinc-500 hover:text-red-600"
+                          aria-label={`Remove ${dayName}`}
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                  {errorMsg && (
+                    <tr>
+                      <td colSpan={6} className="px-2 pb-3">
+                        <div
+                          role="alert"
+                          className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+                        >
+                          {errorMsg}
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </Fragment>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
 
       <div className="flex flex-wrap gap-2">
         {activeDays.length < 7 && (
@@ -270,34 +330,30 @@ export function TimeCardCalculator() {
       </div>
 
       {totals && (
-        <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
-          <div className="mb-2 text-sm font-medium text-blue-700">
-            Week Total
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2.5">
+          <div className="flex flex-wrap items-baseline gap-x-2">
+            <span className="text-sm font-medium text-blue-700">Week Total</span>
+            <span className="text-xl font-bold tabular-nums text-blue-900">
+              {formatDurationFull(totals.worked)}
+            </span>
           </div>
-          <div className="text-3xl font-bold tabular-nums text-blue-900">
-            {formatDurationFull(totals.worked)}
-          </div>
-          <div className="mt-2 grid grid-cols-2 gap-3 text-sm sm:grid-cols-3">
-            <div>
-              <span className="text-blue-600">Decimal hours</span>
-              <p className="font-semibold tabular-nums text-blue-900">
-                {totals.decimalHours.toFixed(2)} hours
-              </p>
-            </div>
-            <div>
-              <span className="text-blue-600">Total minutes</span>
-              <p className="font-semibold tabular-nums text-blue-900">
-                {totals.minutes} minutes
-              </p>
-            </div>
-            <div>
-              <span className="text-blue-600">Total break</span>
-              <p className="font-semibold tabular-nums text-blue-900">
+          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-sm text-blue-700">
+            <span className="font-semibold tabular-nums text-blue-900">
+              {totals.decimalHours.toFixed(2)} hours
+            </span>
+            <span aria-hidden="true">·</span>
+            <span className="font-semibold tabular-nums text-blue-900">
+              {totals.minutes} minutes
+            </span>
+            <span aria-hidden="true">·</span>
+            <span>
+              break{" "}
+              <span className="font-semibold tabular-nums text-blue-900">
                 {formatDurationFull(totals.break)}
-              </p>
-            </div>
+              </span>
+            </span>
           </div>
-          <div className="mt-3 flex gap-2">
+          <div className="flex gap-2">
             <CopyButton text={copyText} />
             <ResetButton onClick={resetAll} />
           </div>

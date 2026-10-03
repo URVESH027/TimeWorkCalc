@@ -25,4 +25,19 @@ describe("CopyButton", () => {
       expect(button).toHaveTextContent("Copied");
     });
   });
+
+  it("announces copy feedback through a polite status region", async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, { clipboard: { writeText } });
+
+    render(<CopyButton text="8 hours" />);
+    const status = screen.getByRole("status");
+    expect(status).toHaveTextContent("");
+
+    fireEvent.click(screen.getByRole("button"));
+
+    await waitFor(() => {
+      expect(status).toHaveTextContent("Copied to clipboard");
+    });
+  });
 });

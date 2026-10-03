@@ -2,6 +2,7 @@
 export {
   createClockTime,
   toMinutesSinceMidnight,
+  toSecondsSinceMidnight,
   fromMinutesSinceMidnight,
   parseClockTime,
   isValidClockTime,

@@ -14,6 +14,7 @@ export function ResultCard({
       className="rounded-lg border border-zinc-200 bg-zinc-50 p-4"
       role="region"
       aria-label="Results"
+      aria-live="polite"
     >
       <p className="mb-1 text-sm font-medium text-zinc-500">{primaryLabel}</p>
       <p className="text-2xl font-semibold tabular-nums text-zinc-900 sm:text-3xl">

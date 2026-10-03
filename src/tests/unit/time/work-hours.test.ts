@@ -173,4 +173,43 @@ describe("calculateMultiDayTotals", () => {
       expect(result.value.totalWorked).toEqual({ hours: 7, minutes: 0, seconds: 0 });
     }
   });
+
+  it("totals preserve seconds across multiple days", () => {
+    const result = calculateMultiDayTotals([
+      {
+        clockIn: { hours: 9, minutes: 0, seconds: 30, period: null },
+        clockOut: { hours: 17, minutes: 0, seconds: 45, period: null },
+        breaks: [],
+      },
+      {
+        clockIn: { hours: 8, minutes: 30, seconds: 15, period: null },
+        clockOut: { hours: 12, minutes: 30, seconds: 45, period: null },
+        breaks: [],
+      },
+    ]);
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      // Day 1: 8h 0m 15s; Day 2: 4h 0m 30s
+      expect(result.value.days[0].worked).toEqual({ hours: 8, minutes: 0, seconds: 15 });
+      expect(result.value.days[1].worked).toEqual({ hours: 4, minutes: 0, seconds: 30 });
+      expect(result.value.totalWorked).toEqual({ hours: 12, minutes: 0, seconds: 45 });
+      expect(result.value.totalDecimalHours).toBe(12.0125);
+    }
+  });
+
+  it("single day with seconds and a minute break", () => {
+    const result = calculateMultiDayTotals([
+      {
+        clockIn: { hours: 9, minutes: 15, seconds: 45, period: null },
+        clockOut: { hours: 17, minutes: 0, seconds: 15, period: null },
+        breaks: [30],
+      },
+    ]);
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      // Elapsed 7h 44m 30s − 30m break = 7h 14m 30s
+      expect(result.value.totalElapsed).toEqual({ hours: 7, minutes: 44, seconds: 30 });
+      expect(result.value.totalWorked).toEqual({ hours: 7, minutes: 14, seconds: 30 });
+    }
+  });
 });

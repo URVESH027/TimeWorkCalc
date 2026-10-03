@@ -4,16 +4,16 @@ import type {
   WorkHoursResult,
   EngineResult,
 } from "@/types/time";
-import { toMinutesSinceMidnight } from "./clock-time";
-import {
-  createDuration,
-  toTotalSeconds,
-  fromTotalSeconds,
-} from "./duration";
+import { toSecondsSinceMidnight } from "./clock-time";
+import { toTotalSeconds, fromTotalSeconds } from "./duration";
 import { durationToDecimalHours } from "./conversions";
 
 /**
  * Calculate the time difference between two clock times.
+ *
+ * Arithmetic is performed in total seconds so non-zero input seconds are
+ * preserved (14:45:30 → 15:00:00 = 14m 30s, not 15m). Minute-only inputs
+ * behave exactly as before.
  *
  * Same-day mode: assumes both times are on the same day.
  *   If end < start, returns an error (user should use overnight mode).
@@ -25,28 +25,29 @@ import { durationToDecimalHours } from "./conversions";
  * 22:00 → 06:00 (overnight) = 8h 00m
  * 09:00 → 09:00 (same day) = 0h 00m
  * 09:00 → 09:00 (overnight) = 0h 00m
+ * 14:45:30 → 15:00:00 (same day) = 14m 30s
  */
 export function timeDifference(
   start: ClockTime,
   end: ClockTime,
   overnight = false,
 ): EngineResult<TimeDifferenceResult> {
-  const startMinutes = toMinutesSinceMidnight(start);
-  const endMinutes = toMinutesSinceMidnight(end);
+  const startSeconds = toSecondsSinceMidnight(start);
+  const endSeconds = toSecondsSinceMidnight(end);
 
-  let diffMinutes: number;
+  let diffSeconds: number;
 
   if (overnight) {
-    if (endMinutes < startMinutes) {
+    if (endSeconds < startSeconds) {
       // End is on the next day
-      diffMinutes = endMinutes + 24 * 60 - startMinutes;
+      diffSeconds = endSeconds + 24 * 3600 - startSeconds;
     } else {
       // End is same day or equal (equal = 0 duration)
-      diffMinutes = endMinutes - startMinutes;
+      diffSeconds = endSeconds - startSeconds;
     }
   } else {
     // Same-day mode: end must be >= start
-    if (endMinutes < startMinutes) {
+    if (endSeconds < startSeconds) {
       return {
         ok: false,
         error: {
@@ -56,27 +57,17 @@ export function timeDifference(
         },
       };
     }
-    diffMinutes = endMinutes - startMinutes;
+    diffSeconds = endSeconds - startSeconds;
   }
 
-  const durationResult = createDuration(
-    Math.floor(diffMinutes / 60),
-    diffMinutes % 60,
-    0,
-  );
-
-  if (!durationResult.ok) {
-    return { ok: false, error: durationResult.error };
-  }
-
-  const duration = durationResult.value;
+  const duration = fromTotalSeconds(diffSeconds);
   const decimalHours = durationToDecimalHours(duration);
 
   return {
     ok: true,
     value: {
       duration,
-      totalMinutes: diffMinutes,
+      totalMinutes: Math.floor(diffSeconds / 60),
       decimalHours,
     },
   };

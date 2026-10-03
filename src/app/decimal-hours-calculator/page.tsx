@@ -18,6 +18,10 @@ const RELATED = [
   { slug: "hours-calculator", title: "Hours Calculator", description: "Calculate elapsed time between two times" },
   { slug: "time-card-calculator", title: "Time Card Calculator", description: "Track a full work week" },
   { slug: "time-calculator", title: "Time Calculator", description: "Add and subtract time values" },
+  { slug: "hours-to-minutes", title: "Hours to Minutes Converter", description: "Convert hours into minutes" },
+  { slug: "minutes-to-hours", title: "Minutes to Hours Converter", description: "Convert minutes to hours and decimal" },
+  { slug: "timesheet-calculator", title: "Timesheet Calculator", description: "Enter hours worked each day for weekly totals" },
+  { slug: "military-time-converter", title: "Military Time Converter", description: "Convert between military, 24-hour, and 12-hour time" },
 ];
 
 const CONVERSION_CHART = [
@@ -179,6 +183,45 @@ export default function DecimalHoursCalculatorPage() {
                 use decimal hours for time arithmetic.
               </li>
             </ul>
+          </div>
+
+          <div>
+            <h2 className="mb-2 text-lg font-semibold text-zinc-900">
+              Frequently asked questions
+            </h2>
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-medium text-zinc-800">
+                  How do I convert 8 hours 45 minutes to decimal hours?
+                </h3>
+                <p className="mt-1">
+                  Divide the minutes by 60 and add the hours: 45 &divide; 60 =
+                  0.75, so 8 hours 45 minutes = <strong>8.75</strong> decimal
+                  hours.
+                </p>
+              </div>
+              <div>
+                <h3 className="font-medium text-zinc-800">
+                  How do I convert decimal hours back to hours and minutes?
+                </h3>
+                <p className="mt-1">
+                  Multiply the fractional part by 60: 0.75 &times; 60 = 45, so
+                  8.75 decimal hours = 8 hours 45 minutes. Use the
+                  calculator&apos;s conversion direction switch to do it
+                  instantly.
+                </p>
+              </div>
+              <div>
+                <h3 className="font-medium text-zinc-800">
+                  Why does payroll use decimal hours?
+                </h3>
+                <p className="mt-1">
+                  Payroll multiplies hours by an hourly rate: 7.5 &times; $20 =
+                  $150. A time written as &ldquo;7:30&rdquo; would break that
+                  math, so systems store hours in decimal form.
+                </p>
+              </div>
+            </div>
           </div>
         </section>
 

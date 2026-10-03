@@ -8,6 +8,12 @@ const CALCULATORS = [
   { href: "/hours-calculator", label: "Hours Calculator" },
   { href: "/time-calculator", label: "Time Calculator" },
   { href: "/decimal-hours-calculator", label: "Decimal Hours Calculator" },
+  { href: "/hours-to-minutes", label: "Hours to Minutes Converter" },
+  { href: "/minutes-to-hours", label: "Minutes to Hours Converter" },
+  { href: "/timesheet-calculator", label: "Timesheet Calculator" },
+  { href: "/work-hours-in-a-year-calculator", label: "Work Hours in a Year Calculator" },
+  { href: "/military-time-converter", label: "Military Time Converter" },
+  { href: "/overtime-calculator", label: "Overtime Calculator" },
 ];
 
 const RESOURCES = [

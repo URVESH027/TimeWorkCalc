@@ -18,6 +18,9 @@ const RELATED = [
   { slug: "decimal-hours-calculator", title: "Decimal Hours Calculator", description: "Convert hours and minutes to decimal" },
   { slug: "hours-calculator", title: "Hours Calculator", description: "Find elapsed time between two times" },
   { slug: "time-calculator", title: "Time Calculator", description: "Add and subtract time values" },
+  { slug: "timesheet-calculator", title: "Timesheet Calculator", description: "Enter hours worked each day for weekly totals" },
+  { slug: "work-hours-in-a-year-calculator", title: "Work Hours in a Year Calculator", description: "Calculate annual hours from your weekly schedule" },
+  { slug: "overtime-calculator", title: "Overtime Calculator", description: "Estimate overtime hours and gross pay over your threshold" },
 ];
 
 export default function TimeCardCalculatorPage() {

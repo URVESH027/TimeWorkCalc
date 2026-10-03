@@ -38,4 +38,16 @@ describe("ResultCard", () => {
     render(<ResultCard primaryLabel="Result" primaryValue="5h" />);
     expect(screen.queryByText("Decimal hours")).not.toBeInTheDocument();
   });
+
+  it("acts as a polite live region for result updates", () => {
+    const { rerender } = render(
+      <ResultCard primaryLabel="Result" primaryValue="8 hours" />,
+    );
+    const region = screen.getByRole("region", { name: "Results" });
+    expect(region).toHaveAttribute("aria-live", "polite");
+
+    rerender(<ResultCard primaryLabel="Result" primaryValue="8 hours 30 minutes" />);
+    expect(region).toHaveTextContent("8 hours 30 minutes");
+    expect(screen.getAllByRole("region", { name: "Results" })).toHaveLength(1);
+  });
 });

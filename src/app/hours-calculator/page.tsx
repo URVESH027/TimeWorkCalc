@@ -18,6 +18,7 @@ const RELATED = [
   { slug: "time-calculator", title: "Time Calculator", description: "Add and subtract time values" },
   { slug: "time-card-calculator", title: "Time Card Calculator", description: "Track a full work week" },
   { slug: "decimal-hours-calculator", title: "Decimal Hours Calculator", description: "Convert hours and minutes to decimal" },
+  { slug: "military-time-converter", title: "Military Time Converter", description: "Convert between military, 24-hour, and 12-hour time" },
 ];
 
 export default function HoursCalculatorPage() {
@@ -63,10 +64,10 @@ export default function HoursCalculatorPage() {
               Elapsed time = End time &minus; Start time
             </p>
             <p className="mt-2">
-              Both times are converted to minutes since midnight, then
+              Both times are converted to seconds since midnight, then
               subtracted. If overnight is enabled and the end time is earlier
-              than the start time, 24 hours (1,440 minutes) is added to the end
-              time before subtracting.
+              than the start time, 24 hours (86,400 seconds) is added to the
+              end time before subtracting.
             </p>
           </div>
 
@@ -112,6 +113,50 @@ export default function HoursCalculatorPage() {
               <li>Track study or exercise sessions</li>
               <li>Convert between clock times and decimal hours</li>
             </ul>
+          </div>
+
+          <div>
+            <h2 className="mb-2 text-lg font-semibold text-zinc-900">
+              Frequently asked questions
+            </h2>
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-medium text-zinc-800">
+                  What if the end time is earlier than the start time?
+                </h3>
+                <p className="mt-1">
+                  Enable &ldquo;Overnight shift&rdquo; to measure across
+                  midnight &mdash; for example, 10:00 PM to 6:00 AM = 8 hours.
+                  Without it, the calculator expects the end time to be after
+                  the start time on the same day.
+                </p>
+              </div>
+              <div>
+                <h3 className="font-medium text-zinc-800">
+                  What time formats can I enter?
+                </h3>
+                <p className="mt-1">
+                  Both 12-hour times with AM/PM (8:30 AM) and 24-hour times
+                  (08:30 or 17:30) work in the start and end fields.
+                </p>
+              </div>
+              <div>
+                <h3 className="font-medium text-zinc-800">
+                  How do I subtract a break from elapsed time?
+                </h3>
+                <p className="mt-1">
+                  This calculator measures raw elapsed time. To deduct unpaid
+                  breaks and get hours actually worked, use the{" "}
+                  <a
+                    href="/work-hours-calculator"
+                    className="text-blue-600 hover:underline"
+                  >
+                    Work Hours Calculator
+                  </a>
+                  .
+                </p>
+              </div>
+            </div>
           </div>
         </section>
 

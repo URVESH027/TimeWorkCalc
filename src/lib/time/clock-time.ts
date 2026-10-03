@@ -75,6 +75,29 @@ export function toMinutesSinceMidnight(time: ClockTime): number {
 }
 
 /**
+ * Convert a ClockTime to seconds since midnight (0-86399).
+ *
+ * Seconds-preserving counterpart of toMinutesSinceMidnight. Used for
+ * elapsed-time arithmetic so that non-zero input seconds are never
+ * silently discarded.
+ *
+ * For 12-hour times, AM 12:00:00 = 0, PM 12:00:00 = 43200.
+ */
+export function toSecondsSinceMidnight(time: ClockTime): number {
+  let h = time.hours;
+
+  if (time.period !== null) {
+    if (time.period === "AM") {
+      h = h === 12 ? 0 : h;
+    } else {
+      h = h === 12 ? 12 : h + 12;
+    }
+  }
+
+  return h * 3600 + time.minutes * 60 + (time.seconds ?? 0);
+}
+
+/**
  * Convert minutes since midnight (0-1439) to a 24-hour ClockTime.
  */
 export function fromMinutesSinceMidnight(totalMinutes: number): ClockTime {
@@ -90,11 +113,15 @@ export function fromMinutesSinceMidnight(totalMinutes: number): ClockTime {
  * Supported formats:
  * - "09:30" (24-hour)
  * - "9:30" (24-hour, no leading zero)
- * - "09:30 AM" (12-hour)
- * - "9:30 PM" (12-hour)
  * - "17:30" (24-hour)
- * - "12:00 AM" (midnight)
- * - "12:00 PM" (noon)
+ * - "09:30 AM" / "9:30 pm" (12-hour with minutes)
+ * - "9:30" (24-hour, hour-only with minutes is never ambiguous)
+ * - "6 am" / "6 pm" / "10 AM" (12-hour, hour only)
+ * - "12:00 AM" (midnight), "12 am" (midnight)
+ * - "12:00 PM" (noon), "12 pm" (noon)
+ *
+ * Hour-only input WITHOUT AM/PM (e.g. "6") is intentionally rejected as
+ * ambiguous because the product has no defined 12/24-hour mode.
  */
 export function parseClockTime(input: string): EngineResult<ClockTime> {
   const trimmed = input.trim();
@@ -106,19 +133,41 @@ export function parseClockTime(input: string): EngineResult<ClockTime> {
     };
   }
 
-  // Try 12-hour format: "HH:MM AM/PM" or "H:MM AM/PM"
-  const twelveHourMatch = trimmed.match(
-    /^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)$/i,
+  // Colon form: "HH:MM", "H:MM", "HH:MM:SS", optionally followed by AM/PM.
+  const colonMatch = trimmed.match(
+    /^(\d{1,2}):(\d{2})(?::(\d{2}))?(?:\s*(AM|PM))?$/i,
   );
-  if (twelveHourMatch) {
-    const hours = parseInt(twelveHourMatch[1], 10);
-    const minutes = parseInt(twelveHourMatch[2], 10);
-    const seconds = twelveHourMatch[3]
-      ? parseInt(twelveHourMatch[3], 10)
-      : 0;
-    const period = twelveHourMatch[4].toUpperCase() as "AM" | "PM";
+  if (colonMatch) {
+    const hours = parseInt(colonMatch[1], 10);
+    const minutes = parseInt(colonMatch[2], 10);
+    const seconds = colonMatch[3] ? parseInt(colonMatch[3], 10) : 0;
 
-    // 12-hour format: hours must be 1-12
+    if (colonMatch[4]) {
+      const period = colonMatch[4].toUpperCase() as "AM" | "PM";
+
+      // 12-hour format: hours must be 1-12
+      if (hours < 1 || hours > 12) {
+        return {
+          ok: false,
+          error: {
+            code: "INVALID_HOURS",
+            message: `12-hour format requires hours 1-12, got ${hours}`,
+          },
+        };
+      }
+
+      return createClockTime(hours, minutes, period, seconds);
+    }
+
+    return createClockTime(hours, minutes, null, seconds);
+  }
+
+  // Hour-only 12-hour format: "6 am", "10 PM", "6  pm"
+  const hourOnlyMatch = trimmed.match(/^(\d{1,2})\s*(AM|PM)$/i);
+  if (hourOnlyMatch) {
+    const hours = parseInt(hourOnlyMatch[1], 10);
+    const period = hourOnlyMatch[2].toUpperCase() as "AM" | "PM";
+
     if (hours < 1 || hours > 12) {
       return {
         ok: false,
@@ -129,28 +178,25 @@ export function parseClockTime(input: string): EngineResult<ClockTime> {
       };
     }
 
-    return createClockTime(hours, minutes, period, seconds);
+    return createClockTime(hours, 0, period, 0);
   }
 
-  // Try 24-hour format: "HH:MM" or "H:MM" or "HH:MM:SS"
-  const twentyFourHourMatch = trimmed.match(
-    /^(\d{1,2}):(\d{2})(?::(\d{2}))?$/,
-  );
-  if (twentyFourHourMatch) {
-    const hours = parseInt(twentyFourHourMatch[1], 10);
-    const minutes = parseInt(twentyFourHourMatch[2], 10);
-    const seconds = twentyFourHourMatch[3]
-      ? parseInt(twentyFourHourMatch[3], 10)
-      : 0;
-
-    return createClockTime(hours, minutes, null, seconds);
+  // Hour-only without AM/PM is ambiguous (no defined 12/24-hour mode).
+  if (/^\d{1,2}$/.test(trimmed)) {
+    return {
+      ok: false,
+      error: {
+        code: "INVALID_FORMAT",
+        message: `Ambiguous time "${trimmed}". Add AM or PM (e.g. "6 pm") or use 24-hour format with minutes (e.g. "06:00" or "18:00").`,
+      },
+    };
   }
 
   return {
     ok: false,
     error: {
       code: "INVALID_FORMAT",
-      message: `Cannot parse time string: "${trimmed}". Expected format: "HH:MM" or "HH:MM AM/PM"`,
+      message: `Cannot parse time string: "${trimmed}". Expected format: "HH:MM", "HH:MM AM/PM", or "H AM/PM"`,
     },
   };
 }

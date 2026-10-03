@@ -42,13 +42,12 @@ export default function PrivacyPage() {
 
         <section>
           <h2 className="mb-2 text-lg font-semibold text-zinc-900">
-            Local storage
+            Browser storage
           </h2>
           <p>
-            Some calculators may use your browser&apos;s local storage to
-            remember your preferences (such as time format). This data stays
-            entirely on your device and is never transmitted to any server. You
-            can clear this data at any time by clearing your browser data.
+            TimeWorkCalc does not use your browser&apos;s local storage or
+            session storage. Your inputs are kept only in the current page and
+            are discarded when you close or reload it.
           </p>
         </section>
 
@@ -67,9 +66,8 @@ export default function PrivacyPage() {
           </h2>
           <p>
             TimeWorkCalc does not embed any third-party scripts, analytics
-            services, or advertising networks. The only external resource loaded
-            is the Geist font from Google Fonts, which is subject to
-            Google&apos;s privacy policy.
+            services, or advertising networks. Fonts are self-hosted, so no
+            external resources are loaded at runtime.
           </p>
         </section>
 

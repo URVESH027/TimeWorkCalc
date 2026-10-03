@@ -88,11 +88,12 @@ export default function AboutPage() {
             Accuracy
           </h2>
           <p>
-            The calculation engine uses integer arithmetic (total seconds) to
-            avoid floating-point precision issues. Results are rounded
-            appropriately for display. While we strive for accuracy, these
-            calculators are tools for personal reference and should not be
-            considered official payroll or legal records.
+            The time calculation engine uses integer arithmetic (whole seconds)
+            so durations are free of floating-point rounding. Pay and overtime
+            estimates use standard decimal arithmetic and are rounded for
+            display. While we strive for accuracy, these calculators are tools
+            for personal reference and should not be considered official
+            payroll or legal records.
           </p>
         </section>
       </div>

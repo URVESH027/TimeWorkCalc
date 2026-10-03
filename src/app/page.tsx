@@ -35,6 +35,42 @@ const CALCULATORS = [
     description: "Convert between hours/minutes and decimal hours.",
     featured: false,
   },
+  {
+    slug: "hours-to-minutes",
+    title: "Hours to Minutes Converter",
+    description: "Convert hours into minutes (2.5 hours = 150 minutes).",
+    featured: false,
+  },
+  {
+    slug: "minutes-to-hours",
+    title: "Minutes to Hours Converter",
+    description: "Convert minutes to hours, hours and minutes, and decimal hours.",
+    featured: false,
+  },
+  {
+    slug: "timesheet-calculator",
+    title: "Timesheet Calculator",
+    description: "Enter hours worked each day and get your weekly total.",
+    featured: false,
+  },
+  {
+    slug: "work-hours-in-a-year-calculator",
+    title: "Work Hours in a Year Calculator",
+    description: "Calculate your annual work hours from your weekly schedule.",
+    featured: false,
+  },
+  {
+    slug: "military-time-converter",
+    title: "Military Time Converter",
+    description: "Convert between military time, 24-hour time, and 12-hour AM/PM time.",
+    featured: false,
+  },
+  {
+    slug: "overtime-calculator",
+    title: "Overtime Calculator",
+    description: "Estimate overtime hours and gross pay over your weekly threshold.",
+    featured: false,
+  },
 ];
 
 export default function HomePage() {
@@ -102,8 +138,8 @@ export default function HomePage() {
               browser. No data leaves your device.
             </li>
             <li>
-              <strong>Accurate</strong> &mdash; integer-based arithmetic avoids
-              floating-point precision issues.
+              <strong>Precise time arithmetic</strong> &mdash; durations are
+              calculated in whole seconds to avoid rounding drift.
             </li>
             <li>
               <strong>Mobile-friendly</strong> &mdash; works on phones, tablets,
